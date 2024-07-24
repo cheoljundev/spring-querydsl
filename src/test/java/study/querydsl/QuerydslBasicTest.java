@@ -41,15 +41,14 @@ public class QuerydslBasicTest {
 
     @Test
     public void startJPQL() {
-        // given
+        //when
         // member1 찾기
         Member findMember = em.createQuery("select m from Member m where m.username = :username", Member.class)
                 .setParameter("username", "member1")
                 .getSingleResult();
 
-        assertThat(findMember.getUsername()).isEqualTo("member1");
-        //when
         //then
+        assertThat(findMember.getUsername()).isEqualTo("member1");
     }
 
     @Test
@@ -63,6 +62,34 @@ public class QuerydslBasicTest {
                 .select(member)
                 .from(member)
                 .where(member.username.eq("member1"))
+                .fetchOne();
+
+        //then
+        assertThat(findMember.getUsername()).isEqualTo("member1");
+    }
+
+    @Test
+    public void search() {
+        //when
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(member.username.eq("member1")
+                        .and(member.age.eq(10)))
+                .fetchOne();
+
+        //then
+        assertThat(findMember.getUsername()).isEqualTo("member1");
+    }
+
+    @Test
+    public void searchAndParam() {
+        //when
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(
+                        member.username.eq("member1"),
+                        member.age.eq(10)
+                )
                 .fetchOne();
 
         //then
